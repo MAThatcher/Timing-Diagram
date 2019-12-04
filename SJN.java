@@ -1,0 +1,99 @@
+/*
+ * TODO:
+ * Order by Priority if two or more
+ * arrive at the same time
+ *  
+ */
+
+import java.util.*;
+public class SJN{
+  private Task[] tasks;
+  private int time = 0;
+  private String[][] output;
+  private Task[] order;
+  
+  //our constructor
+  public SJN (Task[] ourProcesses){
+    tasks = ourProcesses;
+    order = new Task[tasks.length];
+    // How long is our graph going to be
+    for (int i = 0; i < tasks.length; i++){
+      time += tasks[i].getServiceTime();
+    }
+    
+    // create output with the proper dimentions
+    // output[Y][X]
+    output = new String[tasks.length][ time +1];
+    
+    //format our output
+    for(int i = 0 ; i < output.length ; i++){
+      for (int j = 0 ; j < output[i].length ; j++){
+        output[i][j] = " ";
+      }
+    }
+    for(int i = 0 ; i < tasks.length ; i++){
+      output[i][0] = tasks[i].getName();
+    }
+    //output formatting done
+    
+    // find what task will be run first
+    order[0]= tasks[0];
+    for(int i = 0 ; i < tasks.length ; i++){
+      if(order[0].getArrival() > tasks[i].getArrival()){
+        order[0] = tasks[i];
+      }
+    }
+    
+    int location = 0;
+    for (int i = 1 ; i < output[0].length ; i++){  
+      for (int j = 0 ; j < output.length ; j++){
+        //when a task arrives
+        if (tasks[j].getArrival() == i-1 && i != 1){
+          for (int k = location+1; k < order.length ; k++){
+            if (order[k] == null){
+              order[k] = tasks[j];
+              k = order.length+2;
+            }
+            else if (order[k].getServiceTime() > tasks[j].getServiceTime()){
+              //run insert algorythm to insert into this place
+              for (int index = order.length-1 ; index > k ; index--){
+                order[index] = order[index -1];
+              }
+              order[k] = tasks[j];
+              k = order.length+2;
+            }
+          }
+        }// end if statement for when task arrives
+        
+        if (order[location].getServiceTimeRemaning() != 0 && order[location].getName() == output[j][0]){
+          output[j][i] = "X";
+          order[location].processRan();
+        }
+        if (order[location].getServiceTimeRemaning() == 0 && order[location].getName() == output[j][0]){
+          output[j][i] = String.valueOf(i);
+          location++;
+          j = tasks.length;
+        }
+      }
+    }
+    for (int i = 0 ; i < tasks.length ; i++){
+      tasks[i].setServiceTimeRemaning(tasks[i].getServiceTime());
+    }
+  }
+
+    
+
+  public void showOutput()
+  {
+    System.out.println("SHORTEST JOB NEXT");
+    for(int i = output.length -1 ; i >= 0; i--)
+    {
+      for (int j = 0 ; j < output[i].length ; j++)
+      {
+        System.out.print(output[i][j] + " ");
+      }
+      System.out.println("");
+    }
+  }
+  
+}

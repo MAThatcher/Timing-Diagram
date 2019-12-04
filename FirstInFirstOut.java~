@@ -1,0 +1,8 @@
+public class FirstInFirstOut
+{
+  
+  public FirstInFirstOut (Task[] processes)
+  {
+    
+  }
+}
